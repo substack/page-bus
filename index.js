@@ -19,7 +19,7 @@ module.exports = function (namespace) {
     var times = 0;
     function createWorker (cb) {
         var ready = false;
-        try { var worker = new SharedWorker(ucode, prefix) }
+        try { var worker = new SharedWorker(ucode, namespace) }
         catch (err) {
             ucode = localStorage.getItem(prefix, 'URL');
             times ++;
