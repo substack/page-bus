@@ -17,17 +17,20 @@ module.exports = function (namespace) {
     function createWorker (cb) {
         try { var worker = new SharedWorker(ucode, namespace) }
         catch (err) {
-            ucode = getOrLoad();
-            times ++;
-            return createWorker(cb);
+            ucode = null;
+            return setTimeout(function () {
+                ucode = getOrLoad();
+                createWorker(cb);
+            }, Math.min(++times * 50, 500));
         }
         worker.port.addEventListener('message', onmessage);
+        
         var to = setTimeout(function () {
             // DEAD, try again
             worker.port.removeEventListener('message', onmessage);
             ucode = getOrLoad();
             createWorker(cb);
-        }, times++ === 0 ? 50 : 500);
+        }, Math.min(++times * 50, 500));
         worker.port.start();
         
         function onmessage (msg) {
