@@ -32,7 +32,7 @@ Compile with browserify then open this page up on a few tabs.
 
 The messages get shared hooray!
 
-[Check out the demo on neocities.]()
+[Check out the demo on neocities.](https://substack.neocities.org/pagebus.html)
 
 # methods
 
