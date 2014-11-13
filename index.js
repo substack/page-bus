@@ -17,7 +17,7 @@ module.exports = function (namespace) {
     function createWorker (cb) {
         try { var worker = new SharedWorker(ucode, namespace) }
         catch (err) {
-            ucode = localStorage.getItem(prefix, 'URL');
+            ucode = getOrLoad();
             times ++;
             return createWorker(cb);
         }
@@ -25,12 +25,7 @@ module.exports = function (namespace) {
         var to = setTimeout(function () {
             // DEAD, try again
             worker.port.removeEventListener('message', onmessage);
-            var ncode = localStorage.getItem(prefix + 'URL');
-            if (ucode !== ncode) {
-                ucode = ncode; // a worker was set up elsewhere
-            }
-            else ucode = URL.createObjectURL(code);
-             
+            ucode = getOrLoad();
             createWorker(cb);
         }, times++ === 0 ? 50 : 500);
         worker.port.start();
@@ -40,6 +35,14 @@ module.exports = function (namespace) {
             clearTimeout(to);
             cb(worker);
         }
+    }
+    
+    function getOrLoad () {
+        var ncode = localStorage.getItem(prefix + 'URL');
+        if (ucode !== ncode) {
+            return ncode; // a worker was set up elsewhere
+        }
+        return URL.createObjectURL(code);
     }
     
     var emitter = new EventEmitter;
