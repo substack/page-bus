@@ -1,10 +1,8 @@
 var EventEmitter = require('events').EventEmitter;
 var isarray = require('isarray');
 
-module.exports = function (namespace) {
-    if (!namespace) namespace = 'default';
-    
-    var prefix = '_pageBus!' + namespace + '!';
+module.exports = function () {
+    var prefix = '_pageBus!';
     var code = new Blob(
         [ '(' + worksrc + ')()' ],
         { type: 'text/javascript' }
@@ -15,7 +13,7 @@ module.exports = function (namespace) {
     
     var times = 0;
     function createWorker (cb) {
-        try { var worker = new SharedWorker(ucode, namespace) }
+        try { var worker = new SharedWorker(ucode) }
         catch (err) {
             ucode = null;
             return setTimeout(function () {
