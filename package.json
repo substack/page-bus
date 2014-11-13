@@ -27,7 +27,9 @@
     "webworker",
     "createObjectURL",
     "iframe",
-    "postMessage"
+    "postMessage",
+    "offline",
+    "offline-first"
   ],
   "author": {
     "name": "James Halliday",
