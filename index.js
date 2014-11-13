@@ -54,6 +54,7 @@ module.exports = function () {
     };
     
     createWorker(function (w) {
+        emitter.emit('_connect', ucode);
         localStorage.setItem(prefix + 'URL', ucode);
         w.port.addEventListener('message', function (ev) {
             if (isarray(ev.data) && ev.data[0] === prefix) {

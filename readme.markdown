@@ -47,6 +47,13 @@ Create a new event emitter `bus` under a string `namespace`.
 All other pages on the same domain in the same browser will be able to open the
 event emitter.
 
+# special events
+
+## bus.on('_connect', function (blobUrl) {})
+
+When the connection is established, this event fires with the underlying blob
+url to the shared worker code.
+
 # install
 
 With [npm](https://npmjs.org) do:
