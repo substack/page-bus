@@ -1,6 +1,6 @@
 {
   "name": "page-bus",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "share an event emitter among pages and frames on the same domain",
   "main": "index.js",
   "dependencies": {
