@@ -1,4 +1,6 @@
-var bus = require('../')();
+var createBus = require('../');
+var bus = createBus();
+
 var pre = document.querySelector('pre');
 var form = document.querySelector('form');
 
