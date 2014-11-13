@@ -19,7 +19,12 @@ module.exports = function (namespace) {
     var times = 0;
     function createWorker (cb) {
         var ready = false;
-        var worker = new SharedWorker(ucode, prefix);
+        try { var worker = new SharedWorker(ucode, prefix) }
+        catch (err) {
+            ucode = localStorage.getItem(prefix, 'URL');
+            times ++;
+            return createWorker(cb);
+        }
         worker.port.addEventListener('message', onmessage);
         var to = setTimeout(function () {
             // DEAD, try again
