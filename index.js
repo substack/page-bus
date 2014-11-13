@@ -11,14 +11,10 @@ module.exports = function (namespace) {
     );
     
     var ucode = localStorage.getItem(prefix + 'URL');
-    if (!ucode) {
-        ucode = URL.createObjectURL(code);
-        localStorage.setItem(prefix + 'URL', ucode);
-    }
+    if (!ucode) ucode = URL.createObjectURL(code);
     
     var times = 0;
     function createWorker (cb) {
-        var ready = false;
         try { var worker = new SharedWorker(ucode, namespace) }
         catch (err) {
             ucode = localStorage.getItem(prefix, 'URL');
@@ -29,15 +25,18 @@ module.exports = function (namespace) {
         var to = setTimeout(function () {
             // DEAD, try again
             worker.port.removeEventListener('message', onmessage);
-            ucode = URL.createObjectURL(code);
-            localStorage.setItem(prefix + 'URL', ucode);
+            var ncode = localStorage.getItem(prefix + 'URL');
+            if (ucode !== ncode) {
+                ucode = ncode; // a worker was set up elsewhere
+            }
+            else ucode = URL.createObjectURL(code);
+             
             createWorker(cb);
         }, times++ === 0 ? 50 : 500);
         worker.port.start();
         
         function onmessage (msg) {
             worker.port.removeEventListener('message', onmessage);
-            localStorage.setItem(prefix + 'URL', ucode);
             clearTimeout(to);
             cb(worker);
         }
@@ -51,6 +50,7 @@ module.exports = function (namespace) {
     };
     
     createWorker(function (w) {
+        localStorage.setItem(prefix + 'URL', ucode);
         w.port.addEventListener('message', function (ev) {
             if (isarray(ev.data) && ev.data[0] === prefix) {
                 EventEmitter.prototype.emit.apply(emitter, ev.data.slice(1));
