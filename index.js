@@ -21,7 +21,6 @@ module.exports = function () {
             clearTimeout(to);
             
             if (localStorage.getItem(prefix + 'URL') !== ucode) {
-                console.log('fuck fuck fuck');
                 retry();
             }
             else onworker(worker, ucode);
@@ -30,6 +29,7 @@ module.exports = function () {
         function ontimeout () {
             // DEAD, try again
             worker.port.removeEventListener('message', onmessage);
+            emitter.emit('_retry', times);
             if (times > 5 && ucode === localStorage.getItem(prefix + 'URL')) {
                 localStorage.removeItem(prefix + 'URL');
             }

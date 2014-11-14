@@ -54,6 +54,11 @@ event emitter.
 When the connection is established, this event fires with the underlying blob
 url to the shared worker code.
 
+## bus.on('_retry', function (times) {})
+
+This event fires for every internal retry event with the counter `times` during
+initialization. Listening to this event can be useful for debugging.
+
 # install
 
 With [npm](https://npmjs.org) do:
