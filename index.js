@@ -10,7 +10,7 @@ module.exports = function () {
         if (!ucode) ucode = createURL();
         
         try { var worker = new SharedWorker(ucode) }
-        catch (err) { setTimeout(retry, Math.min(++times * 100, 500)) }
+        catch (err) { return setTimeout(retry, Math.min(++times * 100, 500)) }
         
         var to = setTimeout(ontimeout, Math.min(++times * 100, 500));
         worker.port.addEventListener('message', onmessage);
