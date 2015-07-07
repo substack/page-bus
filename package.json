@@ -4,6 +4,7 @@
   "description": "share an event emitter among pages and frames on the same domain",
   "main": "index.js",
   "dependencies": {
+    "inherits": "^2.0.1",
     "isarray": "~0.0.1"
   },
   "devDependencies": {
@@ -18,22 +19,22 @@
   },
   "homepage": "https://github.com/substack/page-bus",
   "keywords": [
-    "browser",
-    "event",
-    "emitter",
-    "bus",
     "SharedWorker",
-    "worker",
-    "webworker",
+    "browser",
+    "bus",
     "createObjectURL",
+    "emitter",
+    "event",
     "iframe",
-    "postMessage",
     "offline",
-    "offline-first"
+    "offline-first",
+    "postMessage",
+    "webworker",
+    "worker"
   ],
   "author": {
-    "name": "James Halliday",
     "email": "mail@substack.net",
+    "name": "James Halliday",
     "url": "http://substack.net"
   },
   "license": "MIT"
