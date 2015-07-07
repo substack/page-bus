@@ -4,8 +4,7 @@
   "description": "share an event emitter among pages and frames on the same domain",
   "main": "index.js",
   "dependencies": {
-    "inherits": "^2.0.1",
-    "isarray": "~0.0.1"
+    "inherits": "^2.0.1"
   },
   "devDependencies": {
     "tape": "^3.0.0"
