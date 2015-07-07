@@ -1,9 +1,17 @@
 var EventEmitter = require('events').EventEmitter;
 var isarray = require('isarray');
+var inherits = require('inherits');
 
-module.exports = function () {
+module.exports = PageBus;
+inherits(PageBus, EventEmitter);
+
+function PageBus () {
+    if (!(this instanceof PageBus)) return new PageBus;
+    var self = this;
     var prefix = '_pageBus!';
     var times = 0;
+    EventEmitter.call(this);
+    this._queue = [];
     
     (function retry () {
         var ucode = localStorage.getItem(prefix + 'URL');
@@ -29,21 +37,13 @@ module.exports = function () {
         function ontimeout () {
             // DEAD, try again
             worker.port.removeEventListener('message', onmessage);
-            emitter.emit('_retry', times);
+            EventEmitter.prototype.emit.call(self, '_retry', times);
             if (times > 5 && ucode === localStorage.getItem(prefix + 'URL')) {
                 localStorage.removeItem(prefix + 'URL');
             }
             retry();
         }
     })();
-    
-    var emitter = new EventEmitter;
-    var queue = [];
-    emitter.emit = function () {
-        queue.push(arguments);
-        return emitter;
-    };
-    return emitter;
     
     function createURL () {
         var code = new Blob(
@@ -56,38 +56,43 @@ module.exports = function () {
     }
     
     function onworker (w, ucode) {
-        emitter.emit('_connect', ucode);
-        
+        EventEmitter.prototype.emit.call(self, '_connect', ucode);
         w.port.addEventListener('message', function (ev) {
             if (isarray(ev.data) && ev.data[0] === prefix) {
-                EventEmitter.prototype.emit.apply(emitter, ev.data.slice(1));
+                EventEmitter.prototype.emit.apply(self, ev.data.slice(1));
             }
         });
-        emitter.emit = function () {
-            var args = [].slice.call(arguments);
-            args.unshift(prefix);
-            w.port.postMessage(args);
-            return emitter;
-        };
-        queue.forEach(function (q) {
-            emitter.emit.apply(emitter, q);
+        self._queue.forEach(function (q) {
+            EventEmitter.prototype.emit.apply(self, q);
         });
-        queue = null;
+        self._w = w;
+        self._queue = null;
     }
-};
-
-function worksrc () {
-    var ports = [];
-    self.addEventListener('connect', function (e) {
-        var port = e.ports[0];
-        ports.push(port);
-        
-        port.postMessage('_sharedWorkerBusHello');
-        port.addEventListener('message', function (e) {
-            for (var j = 0; j < ports.length; j++) {
-                ports[j].postMessage(e.data);
-            }
+    
+    function worksrc () {
+        var ports = [];
+        self.addEventListener('connect', function (e) {
+            var port = e.ports[0];
+            ports.push(port);
+            
+            port.postMessage('_sharedWorkerBusHello');
+            port.addEventListener('message', function (e) {
+                for (var j = 0; j < ports.length; j++) {
+                    ports[j].postMessage(e.data);
+                }
+            }, false);
+            port.start();
         }, false);
-        port.start();
-    }, false);
+    }
 }
+
+PageBus.prototype.emit = function () {
+    if (this.queue) {
+        this._queue.push(arguments);
+        return this;
+    }
+    var args = [].slice.call(arguments);
+    args.unshift(this._prefix);
+    this._w.port.postMessage(args);
+    return this;
+};
